@@ -1,0 +1,488 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		03B055B4F595070B06E0BF0F /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECEE497709132C82ADEFBA9A /* TestView.swift */; };
+		0ABAD3A403E2C93DD9C6C126 /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E6B67BE19F0EFCCB246684 /* BLEManager.swift */; };
+		122B5ED8EBA06AB8CD242BCE /* VibrateIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9227D1192D11D2ABE16B26C /* VibrateIntent.swift */; };
+		298606FA3112B3E53D7EA7D3 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042826BA1F1AF997A1914BD6 /* NotificationService.swift */; };
+		3D9529426EAAF1BCBA85E1F7 /* AlarmStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F7FE423D1805ABB8BC302 /* AlarmStore.swift */; };
+		710064C3453532BB34476B7C /* NotificationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E344DAF6532ACF582D61E00D /* NotificationSettingsView.swift */; };
+		A6A844590774252556EF4755 /* PacketFramer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46E5CCC375D09A9245455AE7 /* PacketFramer.swift */; };
+		ACCA7B38F5835727F8EE00CB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1604866D769D45F3C16CD3EC /* Assets.xcassets */; };
+		CFD7388C5630E80ED47C69AD /* RingAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD01F6FC7805EE0FBD3EFAA3 /* RingAppApp.swift */; };
+		D1B338746B35EBD152C1C1F3 /* ConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFCE53542F5A8EAA47093BC /* ConnectionView.swift */; };
+		EAA5C827CEE98C18995992DE /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1344A53DE56F41EF7CE6A26A /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F0C7CA871368857A7015E27C /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84370DB735631D9D471F386C /* SettingsStore.swift */; };
+		F9249A0177588CF6B7DB8859 /* AlarmView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDC525985EAFF0100860D02 /* AlarmView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		707261AE43B75FEFE6D5A86F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A56119E25ED44A534C7EE8A4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 35F98FE1782CC98F046B3D8A;
+			remoteInfo = NotificationService;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9A76D611C5000538E256E0C8 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				EAA5C827CEE98C18995992DE /* NotificationService.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		042826BA1F1AF997A1914BD6 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		1344A53DE56F41EF7CE6A26A /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		1604866D769D45F3C16CD3EC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		34893F7770BD9423C655FA5F /* NotificationService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotificationService.entitlements; sourceTree = "<group>"; };
+		46E5CCC375D09A9245455AE7 /* PacketFramer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketFramer.swift; sourceTree = "<group>"; };
+		4CDC525985EAFF0100860D02 /* AlarmView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmView.swift; sourceTree = "<group>"; };
+		4DD3736055DCBC39F9593E7F /* RingApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RingApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4F15828147B839424B84113B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		53DE6A291929862481D03227 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		54E6B67BE19F0EFCCB246684 /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
+		8306CDB4789FE304BA7CD666 /* RingApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RingApp.entitlements; sourceTree = "<group>"; };
+		84370DB735631D9D471F386C /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
+		B9227D1192D11D2ABE16B26C /* VibrateIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VibrateIntent.swift; sourceTree = "<group>"; };
+		BCFCE53542F5A8EAA47093BC /* ConnectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionView.swift; sourceTree = "<group>"; };
+		BD01F6FC7805EE0FBD3EFAA3 /* RingAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingAppApp.swift; sourceTree = "<group>"; };
+		D40F7FE423D1805ABB8BC302 /* AlarmStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmStore.swift; sourceTree = "<group>"; };
+		E344DAF6532ACF582D61E00D /* NotificationSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsView.swift; sourceTree = "<group>"; };
+		ECEE497709132C82ADEFBA9A /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		516A040944A539D3E99A001C /* BLE */ = {
+			isa = PBXGroup;
+			children = (
+				54E6B67BE19F0EFCCB246684 /* BLEManager.swift */,
+				46E5CCC375D09A9245455AE7 /* PacketFramer.swift */,
+			);
+			path = BLE;
+			sourceTree = "<group>";
+		};
+		5493FC4BB188968E952CC06B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1344A53DE56F41EF7CE6A26A /* NotificationService.appex */,
+				4DD3736055DCBC39F9593E7F /* RingApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6B57A1E69BCA936B09EF4EDE /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4CDC525985EAFF0100860D02 /* AlarmView.swift */,
+				BCFCE53542F5A8EAA47093BC /* ConnectionView.swift */,
+				E344DAF6532ACF582D61E00D /* NotificationSettingsView.swift */,
+				ECEE497709132C82ADEFBA9A /* TestView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		83EEFFEAA9E6F031BDA66892 /* NotificationService */ = {
+			isa = PBXGroup;
+			children = (
+				4F15828147B839424B84113B /* Info.plist */,
+				34893F7770BD9423C655FA5F /* NotificationService.entitlements */,
+				042826BA1F1AF997A1914BD6 /* NotificationService.swift */,
+			);
+			path = NotificationService;
+			sourceTree = "<group>";
+		};
+		A50B0971354C105A809577C8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				D40F7FE423D1805ABB8BC302 /* AlarmStore.swift */,
+				84370DB735631D9D471F386C /* SettingsStore.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A9289DA794CF55265D432044 = {
+			isa = PBXGroup;
+			children = (
+				83EEFFEAA9E6F031BDA66892 /* NotificationService */,
+				F205B838F95D5B1B068641C5 /* RingApp */,
+				5493FC4BB188968E952CC06B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F205B838F95D5B1B068641C5 /* RingApp */ = {
+			isa = PBXGroup;
+			children = (
+				1604866D769D45F3C16CD3EC /* Assets.xcassets */,
+				53DE6A291929862481D03227 /* Info.plist */,
+				8306CDB4789FE304BA7CD666 /* RingApp.entitlements */,
+				BD01F6FC7805EE0FBD3EFAA3 /* RingAppApp.swift */,
+				B9227D1192D11D2ABE16B26C /* VibrateIntent.swift */,
+				516A040944A539D3E99A001C /* BLE */,
+				A50B0971354C105A809577C8 /* Models */,
+				6B57A1E69BCA936B09EF4EDE /* Views */,
+			);
+			path = RingApp;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		35F98FE1782CC98F046B3D8A /* NotificationService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F7D837082353B1EEA7723ACD /* Build configuration list for PBXNativeTarget "NotificationService" */;
+			buildPhases = (
+				DBB642D6A460456A39AA9192 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NotificationService;
+			packageProductDependencies = (
+			);
+			productName = NotificationService;
+			productReference = 1344A53DE56F41EF7CE6A26A /* NotificationService.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		ECE0BA3FE87932A379E75BA4 /* RingApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5CC1282D96F6A62C8DBC8291 /* Build configuration list for PBXNativeTarget "RingApp" */;
+			buildPhases = (
+				8753430FB29D98B7D8B2FBD3 /* Sources */,
+				54E0848B59F6DED3FF2A1BB5 /* Resources */,
+				9A76D611C5000538E256E0C8 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				75839AF3DEF88D1DA28743F1 /* PBXTargetDependency */,
+			);
+			name = RingApp;
+			packageProductDependencies = (
+			);
+			productName = RingApp;
+			productReference = 4DD3736055DCBC39F9593E7F /* RingApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A56119E25ED44A534C7EE8A4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1630;
+			};
+			buildConfigurationList = 1A93ABF354798878F2E28D4A /* Build configuration list for PBXProject "RingApp" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = A9289DA794CF55265D432044;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 5493FC4BB188968E952CC06B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				35F98FE1782CC98F046B3D8A /* NotificationService */,
+				ECE0BA3FE87932A379E75BA4 /* RingApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		54E0848B59F6DED3FF2A1BB5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ACCA7B38F5835727F8EE00CB /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8753430FB29D98B7D8B2FBD3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D9529426EAAF1BCBA85E1F7 /* AlarmStore.swift in Sources */,
+				F9249A0177588CF6B7DB8859 /* AlarmView.swift in Sources */,
+				0ABAD3A403E2C93DD9C6C126 /* BLEManager.swift in Sources */,
+				D1B338746B35EBD152C1C1F3 /* ConnectionView.swift in Sources */,
+				710064C3453532BB34476B7C /* NotificationSettingsView.swift in Sources */,
+				A6A844590774252556EF4755 /* PacketFramer.swift in Sources */,
+				CFD7388C5630E80ED47C69AD /* RingAppApp.swift in Sources */,
+				F0C7CA871368857A7015E27C /* SettingsStore.swift in Sources */,
+				03B055B4F595070B06E0BF0F /* TestView.swift in Sources */,
+				122B5ED8EBA06AB8CD242BCE /* VibrateIntent.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DBB642D6A460456A39AA9192 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				298606FA3112B3E53D7EA7D3 /* NotificationService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		75839AF3DEF88D1DA28743F1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 35F98FE1782CC98F046B3D8A /* NotificationService */;
+			targetProxy = 707261AE43B75FEFE6D5A86F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		17DEEAA5DD5C446DE9388958 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
+				DEVELOPMENT_TEAM = 4RXYGKM63F;
+				INFOPLIST_FILE = NotificationService/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tonykim.RingApp.NotificationService;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		3CEC33A64871D3FB64188C9E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = RingApp/RingApp.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 4RXYGKM63F;
+				INFOPLIST_FILE = RingApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tonykim.RingApp;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		465932E1B8685A1E5714814D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		46A51ACBB42BACCDC3B75C5D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = RingApp/RingApp.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 4RXYGKM63F;
+				INFOPLIST_FILE = RingApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tonykim.RingApp;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		599F5B6B8850075F7BA8B2D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		5CA7CB2630F5C71FFB9B8445 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
+				DEVELOPMENT_TEAM = 4RXYGKM63F;
+				INFOPLIST_FILE = NotificationService/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tonykim.RingApp.NotificationService;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1A93ABF354798878F2E28D4A /* Build configuration list for PBXProject "RingApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				599F5B6B8850075F7BA8B2D7 /* Debug */,
+				465932E1B8685A1E5714814D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5CC1282D96F6A62C8DBC8291 /* Build configuration list for PBXNativeTarget "RingApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3CEC33A64871D3FB64188C9E /* Debug */,
+				46A51ACBB42BACCDC3B75C5D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F7D837082353B1EEA7723ACD /* Build configuration list for PBXNativeTarget "NotificationService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5CA7CB2630F5C71FFB9B8445 /* Debug */,
+				17DEEAA5DD5C446DE9388958 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A56119E25ED44A534C7EE8A4 /* Project object */;
+}
