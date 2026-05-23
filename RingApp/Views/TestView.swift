@@ -154,9 +154,11 @@ struct TestView: View {
                             let contents = (try? String(contentsOf: BLEManager.persistentLogURL, encoding: .utf8)) ?? "empty"
                             UIPasteboard.general.string = contents
                         }
+                        .buttonStyle(.borderless)
                         Spacer()
                         Button("Clear") { ble.clearPersistentLog() }
                             .foregroundStyle(.red)
+                            .buttonStyle(.borderless)
                     }
                     if ble.log.isEmpty {
                         Text("No activity yet")

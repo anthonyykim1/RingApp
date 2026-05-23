@@ -216,7 +216,7 @@ Key files:
 
 ### Known Issues
 - Shortcuts "When I get a message" requires "Message Contains" filter (can't be blank) — workaround: enter a space
-- Shortcuts shows a "Running your automation" notification banner when automation runs — **no way to suppress** for "When I get a message" trigger. The "Notify When Run" toggle (iOS 15.4+) does NOT appear for message-based automations. Only options are Run Immediately / Run After Confirmation / Don't Run. Screen Time App Limits trick (0 min on Shortcuts) is unreliable and may block automations entirely.
+- Shortcuts shows a "Running your automation" notification banner when automation runs — **no native suppression** for "When I get a message" trigger. The "Notify When Run" toggle (iOS 15.4+) does NOT appear for message-based automations (Apple privacy policy). Shortcuts has NO entry in Settings → Notifications because the banner is a system activity indicator, not a `UNNotification`. The only working workaround is a Focus mode with an allow-list that excludes Shortcuts + Time Sensitive Notifications OFF — see `shortcuts.md` § "Suppressing the running-automation banner". Screen Time App Limits trick (0 min on Shortcuts) is unreliable and may block automations entirely.
 - Hide Alerts per-conversation in Messages is not respected by Shortcuts automations
 - Cannot filter by SIM line in Shortcuts
 - **Ring buzzes on BLE reconnect** — confirmed firmware behavior during ANCS re-handshake. Cannot be prevented from app side. stopVibration sent immediately after "Ring ready!" but arrives after the buzz completes. Only triggers when BLE connection is re-established after a drop (e.g. walking out of range).
@@ -231,7 +231,7 @@ Key files:
 
 2. **Shortcuts Hide Alerts awareness** — Can Shortcuts automations now respect per-conversation "Hide Alerts" settings in Messages? Search: "iOS Shortcuts message automation hide alerts filter"
 
-3. **Shortcuts notification suppression** — Can the "automation ran" notification be suppressed natively now? Search: "iOS Shortcuts suppress automation notification"
+3. **Shortcuts notification suppression** — ANSWERED 2026-05-10: no native suppression for message-trigger automations on iOS 17/18 (Apple privacy block). Focus mode allow-list is the only working path. See `shortcuts.md` § "Suppressing the running-automation banner". Re-check on major iOS releases in case Apple relaxes the block.
 
 4. **Accessory Notifications Framework availability** — Has Apple made the AccessoryNotifications framework available globally (not just EU)? Are the entitlements obtainable? Search: "AccessoryNotifications framework iOS availability entitlements"
 
@@ -248,6 +248,7 @@ Key files:
 - **Battery timer:** separate 10-minute timer for battery reads. Battery also fetched once on connect.
 - **Alarm timer:** independent 30s timer dedicated to alarm checks, decoupled from keepalive frequency.
 - **stopVibration on connect:** sent immediately after "Ring ready!" to cut short any ANCS reconnect buzz. Acknowledged by firmware but arrives after buzz completes (~2s BLE write latency during ANCS handshake).
+- **setHeartRateInterval(0) on connect:** sent right after `stopVibration()` (BLEManager.swift:653). The ring firmware resets HR monitoring to its default ~30 min interval after some reconnects, which causes a buzz at each measurement. This handshake step keeps it disabled. Missing this call surfaces as "random phantom vibrations every ~30 min" — see Session 3 root cause below.
 - **Reconnect backoff:** 3-second minimum interval between reconnect attempts to prevent storms.
 - **Net result:** phantom buzzes eliminated during normal use (phone and ring in proximity). Only remaining trigger is physically leaving and returning to Bluetooth range, which causes an unavoidable ANCS reconnect buzz.
 
@@ -256,15 +257,15 @@ Key files:
 - RX frames decoded: length, sequence number, command label (batteryResp, vibratePhoneAck, setStatusAck, etc.), payload hex
 - Disconnect events include NSError domain/code (e.g. `CBErrorDomain code=6` = supervision timeout)
 - `UNUserNotificationCenter.getDeliveredNotifications()` logged on each connect
-- Persistent log file at `Documents/ringapp.log`, append-only, auto-rotation at 2MB
-- **Copy Log** button in Test tab (copies file contents to clipboard without affecting the file)
+- Persistent log file at `Documents/ringapp.log`, rotating window of the last 500 lines (trims to 400 when it hits 500). In-memory view uses the same cap so what's on screen matches what `Copy Log` pastes.
+- **Copy Log** button in Test tab (copies file contents to clipboard without affecting the file). Both Copy and Clear buttons use `.buttonStyle(.borderless)` — without this, SwiftUI Form rows fire every button on tap, so tapping Copy also triggered Clear and wiped the log.
 - Previous `Share Full Log` (ShareLink with file URL) was found to delete/move the source file on share — replaced with clipboard copy
 
 ### Shortcuts Enhancements
 - **Group chat suppression:** Recipients count via Split Text + Count Items. `Count Recipients in Shortcut Input` returns 1 (opaque object); must Split Text by New Lines first. 1:1 = 1 recipient, group = 2+. See `shortcuts.md`.
 - **Per-conversation debounce (leading edge):** `VibrateRingIntent` accepts `debounceKey` (string) and `debounceSeconds` (int, default 0). BLEManager maintains `lastBuzzByKey: [String: Date]`. First text in a conversation buzzes; subsequent texts within the debounce window are skipped silently. No trailing-edge buzz (iOS app suspension makes deferred timers unreliable).
 - **Intent reconnect retry:** if ring is disconnected when Shortcuts fires the intent, it calls `startScan()` and polls for up to 3 seconds before giving up.
-- **Shortcuts notification suppression:** No known way to suppress "Running your automation" banners for message-based automations. The "Notify When Run" toggle does not appear for the "When I get a message" trigger. Shortcuts doesn't appear in Settings → Notifications. The Screen Time App Limits trick (0 min) is unreliable and may block automations entirely.
+- **Shortcuts notification suppression:** Researched 2026-05-10 — no native suppression for message-trigger automations. `Notify When Run` toggle is hidden by Apple for Communication triggers (privacy-mandated). Shortcuts has no entry in Settings → Notifications because the banner is a system activity indicator, not a `UNNotification`. Focus mode allow-list (excluding Shortcuts, Time Sensitive OFF) is the only working path. Full write-up in `shortcuts.md` § "Suppressing the running-automation banner".
 
 ### Shortcut Input Sub-Properties (Message type, confirmed)
 - **Name** — returns message body text (NOT conversation title). Not useful for conversation identification.

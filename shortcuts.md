@@ -14,9 +14,37 @@ The App Intent is `VibrateRingIntent` in `RingApp/VibrateIntent.swift`. It runs 
 
 - **Per-conversation "Hide Alerts" is ignored.** If you mute a conversation in Messages, Shortcuts automations still fire for it.
 - **"Message Contains" cannot be blank** in the "When I get a message" trigger. Workaround: enter a single space.
-- **Shortcuts shows a "Running your automation" banner** each time one fires. Suppress via a Focus mode that silences Shortcuts app notifications.
+- **"Running your automation" banner cannot be suppressed natively.** See [Suppressing the running-automation banner](#suppressing-the-running-automation-banner) below — Focus mode allow-list is the only working path.
 - **No SIM-line filter** in the message trigger.
 - **The message object is semi-opaque.** In an `If`, the raw Shortcut Input only offers "has any value" / "does not". You have to tap the variable chip and pick a sub-property (Message / Content / Recipients / Sender / Name) to get real comparisons.
+
+## Suppressing the running-automation banner
+
+**Status (researched 2026-05-10): no native suppression exists for "When I get a message" automations.** Stop suggesting the in-automation toggle or Settings → Notifications path — both are dead ends for this trigger. The only working approach is a Focus mode allow-list.
+
+### Why the obvious paths don't work
+
+1. **In-automation `Notify When Run` toggle (iOS 15.4+):** Apple deliberately hides this toggle for Communication triggers — "When I get a message," email, location, Bluetooth, Wi-Fi. Privacy-mandated: an automation that reads your messages must surface a visible indicator. The toggle is not greyed-out; it simply does not appear in the editor for these triggers.
+2. **Settings → Notifications → Shortcuts:** Shortcuts has **no entry** in this list on iOS 17/18. The running-automation banner is a system-level activity indicator (similar to Live Activities / SiriKit progress banners), not a `UNNotification`, so per-app notification toggles cannot suppress it.
+3. **Screen Time App Limits (0 min on Shortcuts):** Unreliable; can block the automation entirely. Don't bother.
+4. **Wrapping the automation in a "Run Shortcut" call:** The outer trigger still fires the banner. No help.
+
+### The only known working path: Focus mode allow-list
+
+Create a custom Focus that silences everything except the apps/people you explicitly allow. The running-automation banner is system-level, but Focus *does* gate it.
+
+1. Settings → Focus → **+** → **Custom**, name it (e.g., "Ring Silent").
+2. **People** → "Allow Notifications From" → add anyone you want to hear from.
+3. **Apps** → "Allow Notifications From" → add only the apps that should break through (Messages, Phone, Calendar, etc.). **Do not add Shortcuts.**
+4. Toggle **Time Sensitive Notifications: OFF** — otherwise Shortcuts can still break through.
+5. **Set a Schedule** → 24/7 or Smart Activation, so the Focus is always active.
+
+Side effects:
+- Focus icon (crescent moon or your custom symbol) is visible in status bar / on the lock screen whenever active.
+- Apps not on the allow-list are silenced globally — budget time to walk through home screen and add the ones that matter.
+- Time Sensitive off can suppress 2FA prompts, ride apps, etc. unless individually allowed.
+
+This needs to be integrated with the user's other Focus modes — they may already have a custom Focus and just need to add Shortcuts to its blocked list (or remove it from the allow-list). Don't propose this as a one-off; ask how it should slot into existing Focus arrangement.
 
 ## Messages automation — current setup (Session 3, 2026-04-16)
 
@@ -74,6 +102,39 @@ Recipients lists everyone in the chat EXCEPT you. If wife sends the message, she
 - Resets on app restart (first text always buzzes — desired behavior)
 
 **Important (confirmed 2026-04-16):** Do NOT use `Name` as debounce key — it returns the message body text, not the conversation title. Each message has unique body text so debounce would never match.
+
+## Blocking specific senders (added 2026-04-21)
+
+To suppress buzzes from a named list of phone numbers (any conversation — 1:1 or group), use a **Match Text** regex block instead of multiple `If` actions. The Shortcuts `If` action only supports ONE condition at a time — there is no "Any are true" / "All are true" toggle in the current iOS UI.
+
+### Flow (extends the current messages automation)
+
+Insert right after `Receive messages as input`, before the existing Count/branch logic:
+
+```
+Text: "[Sender] [Recipients]"          ← combine into one string (catches 1:1 and group)
+  ↓
+Match Text
+  Pattern: 4155551234|2125551234|3105554321    ← pipe-separated blocklist
+  Input:   [combined Text above]
+  ↓
+If [Matches] has any value
+    (empty — blocked, do nothing)
+  Otherwise
+    ...existing Count/group-chat/Vibrate flow...
+```
+
+### Pattern rules
+
+- **Digits only, 10 digits per number** (US). No `+1`, no parens, no dashes, no spaces.
+- `|` = OR. Don't put spaces around it — `415555 | 212555` would look for literal spaces.
+- Match is **substring**, not exact. `5551234` would match any number ending in those 7 digits (collision risk). 10 digits is the sweet spot: specific enough to be unique, loose enough to match regardless of iOS formatting (`+1...`, `(415)...`, dashes all work).
+- To add/remove blocked senders later, just edit the pattern string.
+- For iMessage-over-email senders, append the email (escape the dot): `4155551234|jane@example\.com`.
+
+### Why Match Text instead of nested Ifs
+
+Historically Shortcuts' `If` only supports a single condition. Nested `If` / `Else If` chains work but get unwieldy with more than 2–3 blocked numbers. Match Text handles arbitrary list size in one action.
 
 ## Previous automation patterns (archived)
 

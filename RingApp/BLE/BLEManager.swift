@@ -373,11 +373,17 @@ final class BLEManager: NSObject, ObservableObject {
         UserDefaults.standard.set(peripheral.identifier.uuidString, forKey: peripheralUUIDKey)
     }
 
+    // Keep the last ~500 lines on screen and on disk; trim to 400 when we hit the cap.
+    nonisolated private static let logMaxLines = 500
+    nonisolated private static let logTrimTo = 400
+
     private func addLog(_ message: String) {
         let ts = Self.logDateFormatter.string(from: Date())
         let line = "[\(ts)] \(message)"
         log.append(line)
-        if log.count > 200 { log.removeFirst(50) }
+        if log.count > Self.logMaxLines {
+            log.removeFirst(log.count - Self.logTrimTo)
+        }
         persistLogLine(line)
     }
 
@@ -386,20 +392,21 @@ final class BLEManager: NSObject, ObservableObject {
         return dir.appendingPathComponent("ringapp.log")
     }()
 
-    nonisolated private static let persistMaxBytes: Int = 2_000_000
-
     private func persistLogLine(_ line: String) {
         let url = Self.persistentLogURL
         let newLine = line + "\n"
 
-        var existing = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
-        existing += newLine
+        let existing = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
+        var combined = existing + newLine
 
-        if existing.utf8.count > Self.persistMaxBytes {
-            existing = String(existing.suffix(Self.persistMaxBytes / 2))
+        // Trim by line count, not byte count, so on-disk window matches what's on screen.
+        var lines = combined.split(separator: "\n", omittingEmptySubsequences: false)
+        if lines.count > Self.logMaxLines {
+            lines = Array(lines.suffix(Self.logTrimTo))
+            combined = lines.joined(separator: "\n")
         }
 
-        try? existing.write(to: url, atomically: true, encoding: .utf8)
+        try? combined.write(to: url, atomically: true, encoding: .utf8)
     }
 
     func clearPersistentLog() {
@@ -650,6 +657,7 @@ extension BLEManager: CBPeripheralDelegate {
                 connectionState = .connected
                 addLog("Ring ready!")
                 stopVibration()
+                setHeartRateInterval(0)   // disable HR monitoring buzz (~30 min interval)
                 requestBattery()
                 logDeliveredNotifications()
                 startKeepalive()
