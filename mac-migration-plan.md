@@ -9,16 +9,16 @@ Eliminate banner annoyance and broaden notification sources. Ring stays tethered
 ## Confirmed facts (research 2026-05-22 / 2026-05-23)
 
 ### iPhone Shortcut banner cannot be suppressed in iOS 26.3
-Comprehensive web search confirmed: no native suppression for the "When I get a message" trigger in iOS 26.3. Apple's official Communication Triggers page lists only Sender + Message Contains as parameters — no `Notify When Run` toggle, no service-type filter. This is a deliberate Apple privacy restriction applied to all Communication triggers (Message, Email, Wi-Fi, Bluetooth, Arrive/Leave). Consistent from iOS 15.4 through 26.3. Focus mode allow-list remains the only system-level mitigation.
+Comprehensive web search confirmed: no native suppression for the "When I get a message" trigger in iOS 26.3. Apple's official Communication Triggers page lists only Sender + Message Contains as parameters — no `Notify When Run` toggle, no service-type filter. This is a deliberate Apple privacy restriction applied to all Communication triggers (Message, Email, Wi-Fi, Bluetooth, Arrive/Leave). Consistent from iOS 15.4 through 26.3. **Focus mode does NOT mitigate it either — FALSIFIED on-device 2026-05-28 (iOS 26 / iPhone Air):** Shortcuts isn't listable in Focus "Silence Notifications From" (the banner is a system-level activity indicator, not a per-app `UNNotification`), and an allowlist + Time Sensitive OFF leaves the visual pop-up intact. There is NO on-device mitigation — the banner can only be avoided by not running an on-phone Shortcut for the source, i.e. this Mac migration.
 
-### iPhone "When I get a message" automation fires for iMessage ONLY
-User confirmed by testing: SMS does not trigger the existing iPhone Shortcut. Backed by scattered Apple Developer Forum reports. This means the current iPhone Shortcut already provides zero SMS coverage — disabling it loses no functionality we currently have.
+### iPhone "When I get a message" automation fires for iMessage AND SMS — CORRECTED 2026-05-28
+**Supersedes the earlier "iMessage ONLY" claim.** The user retracted that on 2026-05-28: "I misspoke… I was wrong, they are [triggering]." The work-cell green SMS (and SMS generally) **do** trigger the existing iPhone Shortcut and buzz the ring today. Consequence: disabling the iPhone Shortcut would **lose currently-working SMS + iMessage buzzing** until the Mac path fully covers both lines — it is no longer "free." The Mac migration must reach parity before the Shortcut is disabled.
 
 ### Shortcut cannot filter by message service (iMessage vs SMS) at trigger level
 No `Service` / `Type` property exposed. Only Sender + Message Contains. So a "green-only" or "blue-only" filter at trigger time is not possible — but moot given the iMessage-only firing above.
 
 ### Race condition: iPhone Shortcut always wins
-iPhone Shortcut fires on the direct system message-arrival event. Mac chat.db detection + push back to phone adds 100–1000ms minimum. Therefore the Mac path cannot "arrive first" to suppress the Shortcut — and the Shortcut's `lastBuzzByKey` debounce only prevents double-buzzing, not banner display. **The Shortcut must be disabled entirely for blue messages to suppress its banner.**
+iPhone Shortcut fires on the direct system message-arrival event. Mac chat.db detection + push back to phone adds 100–1000ms minimum. Therefore the Mac path cannot "arrive first" to suppress the Shortcut — and the Shortcut's `lastBuzzByKey` debounce only prevents double-buzzing, not banner display. **The Shortcut must be disabled entirely to suppress its banner** — and, per the correction above, doing so sacrifices today's working iMessage + SMS buzzing until the Mac path is proven at parity. The banner can only be killed by fully committing to the Mac path, not by running both in parallel.
 
 ### Mac can receive SMS via TMF or Messages-in-iCloud
 - **Text Message Forwarding (TMF)** on dual-SIM iPhone forwards SMS/MMS/RCS from **both lines** to Mac in real time. No per-line toggle.
@@ -30,14 +30,18 @@ iPhone Shortcut fires on the direct system message-arrival event. Mac chat.db de
 - Signal: native Electron app at signal.org/download/macos/. Cleanest programmatic access via `signal-cli` (separate registered device under same number).
 - WhatsApp: native Mac app exists. No clean API — local DB exists but is not a stable surface. Weak link.
 
-## Policy implication (user decision made)
+## Policy implication (decision REOPENED 2026-05-28)
 
-User has decided to enable TMF despite work IT preferring it off. The trade-off accepted:
+Earlier this was logged as "decision made — enable TMF." As of 2026-05-28 the user has **reopened** it ("I need to reflect on whether to move everything to Mac by enabling forwarding") in light of two corrections: (a) SMS already fires the on-phone Shortcut (above), so the phone path is not zero-coverage, and (b) the on-phone Shortcut sends nothing off-device, whereas TMF duplicates work-cell SMS onto the Mac — the exact thing the user is wary of. Trade-off if TMF is enabled:
 - Work-line SMS (2FA codes, internal alerts, etc.) lands in Mac's Messages.app and stays in `chat.db` history.
 - If Mac is backed up via iCloud Backup or Time Machine, work messages persist there too.
 - TMF (iPhone → Mac direct) is less exposed than Messages-in-iCloud (iPhone → iCloud servers → Mac).
 
-## Chosen architecture
+Net framing the user is weighing: the Mac detector + relay gets built regardless (it's the only path for WhatsApp/Signal/Outlook); the open question is narrowly whether **texts** also ride the Mac path (escapes the banner, costs SMS duplication) or stay on the phone (keeps the banner, duplicates nothing).
+
+## Target architecture (provisional — pending the reopened texts decision above)
+
+> Applies in full only if the user commits to moving **texts** to the Mac. WhatsApp/Signal/Outlook use the same Mac→push→NSE→BLE pipeline regardless; the only conditional piece is whether iMessage+SMS capture moves off the phone (and the Shortcut is disabled).
 
 ```
 All messages (iMessage + SMS, work + personal lines)

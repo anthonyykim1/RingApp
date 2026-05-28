@@ -14,13 +14,13 @@ The App Intent is `VibrateRingIntent` in `RingApp/VibrateIntent.swift`. It runs 
 
 - **Per-conversation "Hide Alerts" is ignored.** If you mute a conversation in Messages, Shortcuts automations still fire for it.
 - **"Message Contains" cannot be blank** in the "When I get a message" trigger. Workaround: enter a single space.
-- **"Running your automation" banner cannot be suppressed natively.** See [Suppressing the running-automation banner](#suppressing-the-running-automation-banner) below — Focus mode allow-list is the only working path.
+- **"Running your automation" banner cannot be suppressed — at all.** Confirmed 2026-05-28 on iOS 26 (iPhone Air): no native suppression AND Focus mode does not work (neither blocklist nor allowlist). See [Suppressing the running-automation banner](#suppressing-the-running-automation-banner) below — the only escape is moving message detection off-device (Mac).
 - **No SIM-line filter** in the message trigger.
 - **The message object is semi-opaque.** In an `If`, the raw Shortcut Input only offers "has any value" / "does not". You have to tap the variable chip and pick a sub-property (Message / Content / Recipients / Sender / Name) to get real comparisons.
 
 ## Suppressing the running-automation banner
 
-**Status (researched 2026-05-10): no native suppression exists for "When I get a message" automations.** Stop suggesting the in-automation toggle or Settings → Notifications path — both are dead ends for this trigger. The only working approach is a Focus mode allow-list.
+**Status (researched 2026-05-10; Focus workaround FALSIFIED on-device 2026-05-28, iOS 26 / iPhone Air): no suppression exists for "When I get a message" automations — not even Focus mode.** Stop suggesting the in-automation toggle, the Settings → Notifications path, OR Focus mode — all three are dead ends for this trigger. The banner is a system-level activity indicator (Shortcuts isn't even listable in Focus's "Silence Notifications From"), so nothing on the phone gates it. The only way to avoid it is to not run an on-phone Shortcut for the source at all — i.e. move detection off-device to the Mac Studio.
 
 ### Why the obvious paths don't work
 
@@ -29,9 +29,15 @@ The App Intent is `VibrateRingIntent` in `RingApp/VibrateIntent.swift`. It runs 
 3. **Screen Time App Limits (0 min on Shortcuts):** Unreliable; can block the automation entirely. Don't bother.
 4. **Wrapping the automation in a "Run Shortcut" call:** The outer trigger still fires the banner. No help.
 
-### The only known working path: Focus mode allow-list
+### Focus mode — TESTED AND DOES NOT WORK (2026-05-28, iOS 26 / iPhone Air)
 
-Create a custom Focus that silences everything except the apps/people you explicitly allow. The running-automation banner is system-level, but Focus *does* gate it.
+The theory below (custom Focus silencing everything except an allow-list) was tested on-device and **failed**. Two attempts:
+- **Blocklist ("Silence Notifications From"):** Shortcuts is **not listable** in the app picker — there is no app to mute, because the banner isn't a per-app `UNNotification`.
+- **Allowlist ("Allow Notifications From" + Time Sensitive OFF):** the visual "Running your automation" pop-up **still appears**.
+
+Conclusion: the banner is a true system-level activity indicator that no Focus configuration gates. Steps retained below only as a record of what was tried.
+
+~~Create a custom Focus that silences everything except the apps/people you explicitly allow.~~ (Does not gate the banner.)
 
 1. Settings → Focus → **+** → **Custom**, name it (e.g., "Ring Silent").
 2. **People** → "Allow Notifications From" → add anyone you want to hear from.

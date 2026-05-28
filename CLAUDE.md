@@ -22,7 +22,7 @@ iOS app for controlling AIZO RING (Rogbid SR10) smart ring vibrations via BLE.
 - **Background persistence:** Background location session prevents iOS suspension
 - **Three timers:** alarm check (30s), keepalive/getVibrate (120s), battery (600s)
 - **Shortcuts debounce:** Uses Sender property (not Name) as debounceKey
-- **"Running your automation" banner:** No native suppression on iOS 17/18 for message-trigger automations (Apple privacy block — `Notify When Run` toggle is hidden, Shortcuts has no Notifications entry). Focus mode allow-list is the only working workaround. Don't re-research this — see `shortcuts.md` § "Suppressing the running-automation banner".
+- **"Running your automation" banner:** No suppression exists on iOS (through iOS 26) for message-trigger automations — Apple privacy block (`Notify When Run` toggle hidden, Shortcuts has no Notifications entry). **Focus mode does NOT work either** — tested on-device 2026-05-28 (iOS 26 / iPhone Air): Shortcuts isn't listable in Focus "Silence Notifications From", and an allowlist + Time Sensitive OFF leaves the visual pop-up. The banner is a system-level activity indicator with no on-device off-switch; the only escape is moving message detection off-device (Mac — see `mac-migration-plan.md`). Don't re-test Focus — see `shortcuts.md` § "Suppressing the running-automation banner".
 
 ## Build
 
@@ -66,7 +66,7 @@ This is where Ring deviates hardest from a typical iOS app:
 - **Bluetooth LE is unavailable in the iOS Simulator** — `CBCentralManager.state` returns `.unsupported`. Every BLE flow (scan, connect, vibration command, HR-monitor disable, keepalive, battery read) must be tested on a real iPhone with the ring nearby. Maestro flows that depend on BLE state will not pass in sim.
 - **Background location session** behaves differently in sim vs. device — sim doesn't suspend the same way, so "did we actually stay alive in background" is a device-only question.
 - **NotificationService extension** runs against APNs payloads — testable on device with a real push, not via simulator launchctl tricks.
-- **Shortcuts / Siri intent invocation** works in sim but the running-automation banner behavior is iOS-version-dependent (see `shortcuts.md` § "Suppressing the running-automation banner" — **do not re-research this**, the workaround is Focus mode allow-list).
+- **Shortcuts / Siri intent invocation** works in sim but the running-automation banner behavior is iOS-version-dependent (see `shortcuts.md` § "Suppressing the running-automation banner" — **do not re-research this**; there is no on-device suppression, Focus mode included).
 - **App Group writes** work in sim, but cross-process visibility (main app ↔ NotificationService) is more representative on device.
 
 For UI-only surfaces (button layout, settings screens, view state independent of BLE), the simulator is fine and faster.
@@ -89,7 +89,7 @@ All interactive or test-relevant views must have stable accessibility identifier
 
 ### When stuck
 
-Three failed attempts at the same bug → STOP. Revert speculative changes. Document the blocker (what was tried, what failed, hypothesis about real root cause). Propose a different approach next session. Context is poisoned at that point; iterating harder deepens the wrong direction. The "Suppressing the running-automation banner" entry in `shortcuts.md` is the canonical example — that one ate hours before Focus mode landed as the fix; don't repeat the pattern in other areas.
+Three failed attempts at the same bug → STOP. Revert speculative changes. Document the blocker (what was tried, what failed, hypothesis about real root cause). Propose a different approach next session. Context is poisoned at that point; iterating harder deepens the wrong direction. The "Suppressing the running-automation banner" entry in `shortcuts.md` is the canonical example — it ate hours, then Focus mode was *assumed* to be the fix, then Focus itself was falsified on-device (2026-05-28). The real lesson: a platform dead end stays dead; stop iterating and route around it (here, off-device capture). Don't repeat the pattern in other areas.
 
 ### Pairing with `/goal`
 
