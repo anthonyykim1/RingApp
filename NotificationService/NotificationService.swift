@@ -1,32 +1,18 @@
 import UserNotifications
 
 class NotificationService: UNNotificationServiceExtension {
-    private let suiteName = "group.com.tonykim.RingApp"
+    // NOTE: The buzz-on-message path runs entirely through the iOS Shortcuts
+    // automation → VibrateRingIntent → BLEManager (see shortcuts.md). The main app
+    // never observed the App Group / Darwin signals this extension used to post, so
+    // those writes were dead weight on every notification and have been removed.
+    // This extension now just passes the notification through unmodified.
+    // (Removing the target entirely is a further win, but that's an Xcode
+    // structural change to be done on the Mac Studio.)
 
     override func didReceive(
         _ request: UNNotificationRequest,
         withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void
     ) {
-        // Signal the main app to vibrate the ring
-        if let defaults = UserDefaults(suiteName: suiteName) {
-            defaults.set(Date().timeIntervalSince1970, forKey: "lastNotificationTimestamp")
-            defaults.set(request.content.title, forKey: "lastNotificationTitle")
-            defaults.synchronize()
-        }
-
-        // Post a Darwin notification to wake the main app
-        let name = "com.tonykim.RingApp.notification" as CFString
-        CFNotificationCenterPostNotification(
-            CFNotificationCenterGetDarwinNotifyCenter(),
-            CFNotificationName(name),
-            nil, nil, true
-        )
-
-        // Pass the notification through unmodified
         contentHandler(request.content)
-    }
-
-    override func serviceExtensionTimeWillExpire() {
-        // No-op — we already signaled on didReceive
     }
 }

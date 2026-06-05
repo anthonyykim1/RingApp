@@ -56,10 +56,18 @@ final class BLEManager: NSObject, ObservableObject {
     // BLE keepalive
     private var keepaliveTimer: Timer?
     private let keepaliveInterval: TimeInterval = 120
-    private var batteryTimer: Timer?
-    private let batteryInterval: TimeInterval = 600
     private var alarmTimer: Timer?
     private let alarmInterval: TimeInterval = 30
+
+    // Scan backoff — bound the fallback scan so we don't search forever when the
+    // ring is off/out of range. The pending-connect() path (known peripheral) is
+    // cheap and auto-reconnects, so active scanning only happens when we have no
+    // known peripheral. Each scan runs for scanWindow, then we pause for a growing
+    // interval before trying again.
+    private var scanTimeoutTimer: Timer?
+    private var scanBackoffStep = 0
+    private let scanWindow: TimeInterval = 12
+    private let scanBackoffSchedule: [TimeInterval] = [15, 30, 60, 120]
 
     // Vibration pattern defaults
     var vibrationBuzzes: Int = 3
@@ -127,6 +135,7 @@ final class BLEManager: NSObject, ObservableObject {
             let known = centralManager.retrievePeripherals(withIdentifiers: [uuid])
             if let peripheral = known.first {
                 addLog("Reconnecting to known ring…")
+                stopScanTimeout()
                 ringPeripheral = peripheral
                 peripheral.delegate = self
                 connectionState = .connecting
@@ -139,6 +148,7 @@ final class BLEManager: NSObject, ObservableObject {
         let connected = centralManager.retrieveConnectedPeripherals(withServices: [serviceUUID])
         if let peripheral = connected.first {
             addLog("Found already-connected ring")
+            stopScanTimeout()
             ringPeripheral = peripheral
             peripheral.delegate = self
             savePeripheralUUID(peripheral)
@@ -147,22 +157,56 @@ final class BLEManager: NSObject, ObservableObject {
             return
         }
 
-        // 3. Fall back to scanning
+        // 3. Fall back to scanning. NOTE: withServices: nil because the ring is
+        // matched by name in didDiscover and may not advertise the FE02 service.
+        // Bounded by scanTimeoutTimer so we don't scan indefinitely.
         connectionState = .scanning
         addLog("Scanning for \(ringName)…")
         centralManager.scanForPeripherals(withServices: nil, options: [
             CBCentralManagerScanOptionAllowDuplicatesKey: false
         ])
+        scheduleScanTimeout()
     }
 
     func disconnect() {
         shouldReconnect = false
         stopKeepalive()
+        stopScanTimeout()
         if let peripheral = ringPeripheral {
             centralManager.cancelPeripheralConnection(peripheral)
         }
         connectionState = .disconnected
         addLog("Disconnected by user")
+    }
+
+    /// Cancel any in-flight scan window/backoff and reset the backoff ladder.
+    private func stopScanTimeout() {
+        scanTimeoutTimer?.invalidate()
+        scanTimeoutTimer = nil
+        scanBackoffStep = 0
+    }
+
+    /// Arm a timer that ends the current scan window and, if still unconnected,
+    /// pauses for a growing interval before scanning again.
+    private func scheduleScanTimeout() {
+        scanTimeoutTimer?.invalidate()
+        scanTimeoutTimer = Timer.scheduledTimer(withTimeInterval: scanWindow, repeats: false) { [weak self] _ in
+            Task { @MainActor in
+                guard let self = self,
+                      self.shouldReconnect,
+                      self.connectionState == .scanning else { return }
+                self.centralManager.stopScan()
+                let idx = min(self.scanBackoffStep, self.scanBackoffSchedule.count - 1)
+                let delay = self.scanBackoffSchedule[idx]
+                self.scanBackoffStep += 1
+                self.connectionState = .disconnected
+                self.addLog("Scan window elapsed — pausing \(Int(delay))s before next scan")
+                try? await Task.sleep(for: .seconds(delay))
+                guard self.shouldReconnect,
+                      self.connectionState == .disconnected else { return }
+                self.startScan()
+            }
+        }
     }
 
     func sendVibratePhone(type: UInt8 = 1) {
@@ -392,25 +436,49 @@ final class BLEManager: NSObject, ObservableObject {
         return dir.appendingPathComponent("ringapp.log")
     }()
 
+    // Count appends since the last trim so we only pay the full read+rewrite
+    // occasionally instead of on every log line.
+    private var logAppendsSinceTrim = 0
+    private let logTrimEvery = 100
+
     private func persistLogLine(_ line: String) {
         let url = Self.persistentLogURL
-        let newLine = line + "\n"
+        guard let data = (line + "\n").data(using: .utf8) else { return }
 
-        let existing = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
-        var combined = existing + newLine
-
-        // Trim by line count, not byte count, so on-disk window matches what's on screen.
-        var lines = combined.split(separator: "\n", omittingEmptySubsequences: false)
-        if lines.count > Self.logMaxLines {
-            lines = Array(lines.suffix(Self.logTrimTo))
-            combined = lines.joined(separator: "\n")
+        // Append the single line. The file always ends in a newline (every write
+        // includes one and trim preserves it), so appends stay line-aligned.
+        if let handle = try? FileHandle(forWritingTo: url) {
+            defer { try? handle.close() }
+            _ = try? handle.seekToEnd()
+            try? handle.write(contentsOf: data)
+        } else {
+            // File doesn't exist yet — create it.
+            try? data.write(to: url, options: .atomic)
         }
 
+        logAppendsSinceTrim += 1
+        if logAppendsSinceTrim >= logTrimEvery {
+            logAppendsSinceTrim = 0
+            trimPersistentLog()
+        }
+    }
+
+    /// Trim the on-disk log to the last `logTrimTo` lines. Called periodically
+    /// rather than on every append.
+    private func trimPersistentLog() {
+        let url = Self.persistentLogURL
+        guard let existing = try? String(contentsOf: url, encoding: .utf8) else { return }
+        // Trim by line count, not byte count, so on-disk window matches what's on screen.
+        let lines = existing.split(separator: "\n", omittingEmptySubsequences: false)
+        guard lines.count > Self.logMaxLines else { return }
+        var combined = lines.suffix(Self.logTrimTo).joined(separator: "\n")
+        if !combined.hasSuffix("\n") { combined += "\n" }
         try? combined.write(to: url, atomically: true, encoding: .utf8)
     }
 
     func clearPersistentLog() {
         try? FileManager.default.removeItem(at: Self.persistentLogURL)
+        logAppendsSinceTrim = 0
         log.removeAll()
     }
 
@@ -489,13 +557,6 @@ final class BLEManager: NSObject, ObservableObject {
     }
 
     private func startKeepalive() {
-        alarmTimer?.invalidate()
-        alarmTimer = Timer.scheduledTimer(withTimeInterval: alarmInterval, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                guard let self = self else { return }
-                self.checkAlarms()
-            }
-        }
         keepaliveTimer?.invalidate()
         keepaliveTimer = Timer.scheduledTimer(withTimeInterval: keepaliveInterval, repeats: true) { [weak self] _ in
             Task { @MainActor in
@@ -504,12 +565,26 @@ final class BLEManager: NSObject, ObservableObject {
                 self.getVibrate(type: 1)
             }
         }
-        batteryTimer?.invalidate()
-        batteryTimer = Timer.scheduledTimer(withTimeInterval: batteryInterval, repeats: true) { [weak self] _ in
+        // Battery is read once on connect and on app foreground (see RingAppApp);
+        // no periodic poll — getBattery can intermittently trigger a firmware buzz.
+        refreshAlarmTimer()
+    }
+
+    /// Start the 30s alarm-check timer only when there's an enabled alarm, and
+    /// tear it down otherwise. Called on connect and whenever alarms change, so
+    /// we don't wake every 30s when no alarm is set (the common case).
+    func refreshAlarmTimer() {
+        let hasEnabledAlarm = alarmStore?.alarms.contains { $0.enabled } ?? false
+        guard hasEnabledAlarm, connectionState == .connected else {
+            alarmTimer?.invalidate()
+            alarmTimer = nil
+            return
+        }
+        guard alarmTimer == nil else { return }
+        alarmTimer = Timer.scheduledTimer(withTimeInterval: alarmInterval, repeats: true) { [weak self] _ in
             Task { @MainActor in
-                guard let self = self, self.connectionState == .connected else { return }
-                self.addLog("periodic: getBattery")
-                self.requestBattery()
+                guard let self = self else { return }
+                self.checkAlarms()
             }
         }
     }
@@ -526,8 +601,6 @@ final class BLEManager: NSObject, ObservableObject {
         alarmTimer = nil
         keepaliveTimer?.invalidate()
         keepaliveTimer = nil
-        batteryTimer?.invalidate()
-        batteryTimer = nil
     }
 
     private static let logDateFormatter: DateFormatter = {
@@ -548,6 +621,7 @@ extension BLEManager: CBCentralManagerDelegate {
                 if shouldReconnect { startScan() }
             case .poweredOff:
                 addLog("Bluetooth powered off")
+                stopScanTimeout()
                 connectionState = .disconnected
             default:
                 addLog("Bluetooth state: \(central.state.rawValue)")
@@ -580,6 +654,7 @@ extension BLEManager: CBCentralManagerDelegate {
             guard peripheral.name == ringName else { return }
             addLog("Found \(ringName) (RSSI: \(RSSI))")
             centralManager.stopScan()
+            stopScanTimeout()
             ringPeripheral = peripheral
             peripheral.delegate = self
             savePeripheralUUID(peripheral)

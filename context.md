@@ -318,6 +318,25 @@ Key files:
 - Added "Sedentary Reminder" section with buttons for: Read Setting, Disable Sedentary Reminder, Disable All (keep calls), Disable via 0x15 Config, Query Ring Config, Disable HR Monitoring
 - RX decoder now labels: setSitRemindAck, getSitRemindResp, setSedentaryConfigAck
 
+## What Was Built (Session 4 — 2026-06-05)
+
+### Battery / Power Optimizations — full detail in `battery.md`
+Investigated iPhone battery drain (user noticed extra drain when ring disconnected). Root
+cause of the disconnected drain: the fallback `scanForPeripherals(withServices: nil)` scanned
+forever. Landed 5 avoidable-waste fixes, none touching the buzz path / keepalive / handshake /
+location:
+1. Bounded the disconnected scan — 12s window + 15→30→60→120s backoff (`scheduleScanTimeout`).
+2. Dropped the 600s `batteryTimer`; battery now read on connect + app foreground (`scenePhase`).
+3. Gated the 30s `alarmTimer` on having an enabled alarm (`refreshAlarmTimer` + `AlarmStore.onAlarmsChanged`).
+4. Stripped the dead NotificationService Darwin/App-Group writes (no main-app listener existed).
+5. Append-only logging (`FileHandle` append + trim every ~100 lines) instead of per-line rewrite.
+
+**Key conclusion:** the background location session is load-bearing (stops phantom + missed
+buzzes), NOT just for alarms — leave it on. See `battery.md` for the evidence and the untouched list.
+
+**Status:** ✅ compiles clean (`build_sim`, iPhone 17 Pro / iOS 26.3). ⏳ NOT device-tested —
+BLE is `.unsupported` in sim. On-device checklist in `battery.md` § Verification status.
+
 ## User Preferences
 
 - User is building this for personal use

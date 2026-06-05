@@ -19,8 +19,8 @@ iOS app for controlling AIZO RING (Rogbid SR10) smart ring vibrations via BLE.
 
 - **BLE vibration protocol:** `vibratePhone [0x10, 0x08, type]` where type=1=start, type=2=stop
 - **HR monitoring disable:** `setHeartRateInterval(0)` (sends `[0x22, 0x11, 0x00]`) runs in the connect handshake at `BLEManager.swift:653` right after `stopVibration()`. Without this, the ring firmware buzzes every ~30 min during HR measurement. Don't remove — silent failures look like "random phantom vibrations."
-- **Background persistence:** Background location session prevents iOS suspension
-- **Three timers:** alarm check (30s), keepalive/getVibrate (120s), battery (600s)
+- **Background persistence:** Background location session prevents iOS suspension. **Load-bearing — do not drop** (it's what stops phantom buzzes + missed buzzes, not just alarms). See `battery.md`.
+- **Timers:** keepalive/getVibrate (120s, always); alarm check (30s, only when an enabled alarm exists); battery read on connect + app foreground (no periodic poll). Disconnected scan is bounded (12s window + 15→120s backoff), not continuous. See `battery.md`.
 - **Shortcuts debounce:** Uses Sender property (not Name) as debounceKey
 - **"Running your automation" banner:** No suppression exists on iOS (through iOS 26) for message-trigger automations — Apple privacy block (`Notify When Run` toggle hidden, Shortcuts has no Notifications entry). **Focus mode does NOT work either** — tested on-device 2026-05-28 (iOS 26 / iPhone Air): Shortcuts isn't listable in Focus "Silence Notifications From", and an allowlist + Time Sensitive OFF leaves the visual pop-up. The banner is a system-level activity indicator with no on-device off-switch; the only escape is moving message detection off-device (Mac — see `mac-migration-plan.md`). Don't re-test Focus — see `shortcuts.md` § "Suppressing the running-automation banner".
 
@@ -113,5 +113,6 @@ Avoid `/goal` for any condition that can only be verified on device (BLE handsha
 
 - BLE protocol / connect handshake / HR-monitor disable → `context.md`
 - Shortcuts / VibrateIntent / running-automation banner → `shortcuts.md`
+- Battery / power, scan backoff, why location is load-bearing → `battery.md`
 - Visual / interaction design → `design.md`
 - Mac-build migration history → `mac-migration-plan.md`

@@ -30,9 +30,17 @@ struct Alarm: Identifiable, Codable {
 @MainActor
 final class AlarmStore: ObservableObject {
     @Published var alarms: [Alarm] = [] {
-        didSet { save() }
+        didSet {
+            save()
+            onAlarmsChanged?()
+        }
     }
     @Published var lastFiredAlarmID: UUID?
+
+    /// Invoked after `alarms` changes (add/delete/toggle) so listeners can react —
+    /// e.g. BLEManager starts/stops its alarm-check timer based on whether any
+    /// enabled alarm exists.
+    var onAlarmsChanged: (() -> Void)?
 
     private let key = "savedAlarms"
 
