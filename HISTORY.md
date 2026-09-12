@@ -3,6 +3,12 @@
 Newest first. One dated entry per episode. Verbatim closed ledger items go to `LEDGER_ARCHIVE.md`;
 this file carries one compressed line each.
 
+### Closed at the 2026-09-12 checkpoint — 2 items moved out of the ledger
+
+_Full verbatim text is in `LEDGER_ARCHIVE.md`._
+
+- [2026-09-12] **#1** [status: closed] `project.yml` is AUTHORITATIVE; the committed `.xcodeproj` is a generated artifact. Settled by execution 2026-09-12: regenerated the spec into a… Full text in `LEDGER_ARCHIVE.md`.
+- [2026-09-12] **#2** [status: closed] RingApp is now harness-covered. `harness init` run, the deliberately-failing placeholder replaced with a real `ios_build` gate, and red -> green… Full text in `LEDGER_ARCHIVE.md`.
 ## 2026-09-12 — `project.yml` made authoritative, and the repo onboarded to the harness
 
 Two standing questions closed in one pass (`OPEN.md` #1 and #2), both settled by execution rather than
