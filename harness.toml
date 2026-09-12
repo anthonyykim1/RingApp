@@ -1,0 +1,54 @@
+# Gates run in a FRESH git worktree branched from this repo — it has NO .venv and NO installed
+# project env, and only TRACKED files. The gate below was verified in exactly that environment
+# (detached worktree at HEAD, 2026-09-12): BUILD SUCCEEDED, and the worktree stayed clean.
+
+[gates]
+# Compiles both targets: the RingApp scheme depends on NotificationService, and the built
+# RingApp.app was confirmed to contain PlugIns/NotificationService.appex.
+#
+# No apostrophes anywhere in this command: a gate is shlex-split, and one quote breaks it.
+# -sdk iphonesimulator is used instead of -destination "generic/platform=iOS Simulator"
+# precisely to keep the command free of quoted, space-bearing arguments.
+#
+# derivedDataPath is build/, which .gitignore already ignores, so build output cannot enter
+# the run diff and trip the always-on diff-scope gate.
+#
+# This gate deliberately does NOT run xcodegen. Tested 2026-09-12: regenerating this project
+# is NOT a no-op — it rewrites two PBXFileReference lines (explicitFileType -> lastKnownFileType
+# on RingApp.app and NotificationService.appex) and adds a TargetAttributes block. All three are
+# cosmetic and do not change the build, but they would dirty project.pbxproj on every run.
+ios_build = "xcodebuild -project RingApp.xcodeproj -scheme RingApp -sdk iphonesimulator -configuration Debug -derivedDataPath build build CODE_SIGNING_ALLOWED=NO"
+
+# No [worktree] setup: there is no package manager here. Xcode and the iOS SDK are installed
+# machine-wide, so a bare checkout can build with no warming step.
+
+[prompt]
+preamble = """
+Do not attempt to self-verify the ios_build gate. The codex exec sandbox cannot reach
+CoreSimulator and will report supportedRuntimes=[] even though the runtime is installed
+machine-wide; that is a sandbox artifact, not a build failure. Make the scoped change,
+confirm the diff, and submit — the harness runs ios_build afterwards with a working toolchain.
+
+Bluetooth LE does not exist in the iOS Simulator: CBCentralManager.state returns .unsupported.
+Never write a test that asserts real BLE behaviour, and never claim a BLE change is verified.
+"""
+
+[disclosure]
+gates_do_not_prove = """
+The gate is COMPILE-ONLY. It proves both targets build; it proves nothing about behaviour.
+Bluetooth LE is unavailable in the iOS Simulator, so scan, connect, vibrate, the heart-rate
+monitor disable, keepalive and battery read CANNOT be exercised by any gate in this repo.
+Every one of those is device-only, on a real iPhone with the ring nearby.
+Compiling is not rendering, so gestures, layout and accessibility stay invisible here.
+Nothing here loads state written by a PREVIOUS release, which is the highest-severity gap:
+alarms and settings persist in the app group across upgrades.
+Background behaviour — whether the app survives iOS suspension — cannot be observed in a build.
+"""
+
+[disclosure.areas.ble]
+text = "BLE changes are DEVICE-ONLY. The gate compiled this code and exercised none of it. Verify on a real iPhone with the ring, and report the device, the iOS version, and whether the ring was connected."
+paths = ["RingApp/BLE/**"]
+
+[disclosure.areas.notification_service]
+text = "NotificationService runs against real APNs payloads. Cross-process app-group visibility between the main app and the extension is only representative on device."
+paths = ["NotificationService/**"]

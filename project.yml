@@ -19,6 +19,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.tonykim.RingApp
+        DEVELOPMENT_TEAM: 4RXYGKM63F
         INFOPLIST_FILE: RingApp/Info.plist
         CODE_SIGN_ENTITLEMENTS: RingApp/RingApp.entitlements
     dependencies:
@@ -31,5 +32,6 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.tonykim.RingApp.NotificationService
+        DEVELOPMENT_TEAM: 4RXYGKM63F
         INFOPLIST_FILE: NotificationService/Info.plist
         CODE_SIGN_ENTITLEMENTS: NotificationService/NotificationService.entitlements

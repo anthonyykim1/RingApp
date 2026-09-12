@@ -9,7 +9,7 @@ no deploy.
 
 - `RingApp/` — main app target (SwiftUI): `BLE/`, `Models/`, `Views/`, `VibrateIntent.swift` (Shortcuts)
 - `NotificationService/` — notification service extension
-- `project.yml` — XcodeGen spec; `RingApp.xcodeproj` is also committed (see `OPEN.md` for which is authoritative)
+- `project.yml` — XcodeGen spec, and **the source of truth** for project structure; `RingApp.xcodeproj` is committed too but is a generated artifact (see the delta under Build and commit)
 - App group `group.com.tonykim.RingApp`; deployment target iOS 17.0; bundle id `com.tonykim.RingApp`
 
 ## Key Technical Details
@@ -41,6 +41,25 @@ Open `RingApp.xcodeproj` in Xcode. `./scripts/commit.sh "msg"` is git add + comm
 **Repo delta — a commit here means a state verified on hardware.** Don't commit just to test: build in
 Xcode against the synced working tree first. Working-tree edits on the Mac Studio auto-sync to the
 MacBook, which is where device builds happen.
+
+**Repo delta — `project.yml` is authoritative, which OVERRIDES the "do structural Xcode changes in
+Xcode on Mac Studio" rule in `~/OffCloud/claude-setup/IOS_AGENT_STACK.md` for structure.** Settled
+2026-09-12 by regenerating the spec into a scratch copy and diffing against the committed
+`project.pbxproj`: they match, **UUIDs included**, so the spec is a complete description of this
+project and nothing structural has drifted. To add a file to a target, add a package, or change a
+build setting, **edit `project.yml` and run `xcodegen generate`** — do not hand-edit the `.xcodeproj`,
+because the next regeneration silently discards it. Xcode-on-Studio is still right for anything the
+spec cannot express (signing UI, capabilities, scheme editing); after such a change, fold the result
+back into `project.yml`.
+
+⚠️ **`DEVELOPMENT_TEAM: 4RXYGKM63F` is now in the spec, per target — it was MISSING until 2026-09-12,
+and that was a live trap:** a `xcodegen generate` before that date produced a project with no signing
+team, which fails to build to a device. If a device build suddenly cannot sign, check this line first.
+
+⚠️ **The committed `.xcodeproj` has NOT been regenerated** (as of 2026-09-12). Regenerating produces
+three cosmetic deltas that do not change the build — `explicitFileType` → `lastKnownFileType` on the
+two product references, and an added `TargetAttributes` block naming the same team. Harmless, but
+**pair the first regeneration with a device build** rather than committing it unverified.
 
 ## iOS protocol — deltas from `~/OffCloud/claude-setup/IOS_AGENT_STACK.md`
 

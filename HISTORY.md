@@ -3,6 +3,64 @@
 Newest first. One dated entry per episode. Verbatim closed ledger items go to `LEDGER_ARCHIVE.md`;
 this file carries one compressed line each.
 
+## 2026-09-12 — `project.yml` made authoritative, and the repo onboarded to the harness
+
+Two standing questions closed in one pass (`OPEN.md` #1 and #2), both settled by execution rather than
+by reading.
+
+**#1 — `project.yml` is authoritative; the committed `.xcodeproj` is a generated artifact.** The repo
+tracked both and nothing said which was the source, which mattered because the global "do structural
+Xcode changes in Xcode on Mac Studio" rule assumes the `.xcodeproj` is. Method: `rsync` the working tree
+to a scratch copy without `RingApp.xcodeproj`, run `xcodegen generate` there, diff the result against the
+committed `project.pbxproj`. **They match, UUIDs included** — so the spec is a complete description of
+this project and nothing structural has drifted since it was written.
+
+⭐ **The diff found a live trap that had nothing to do with the authority question: `project.yml` was
+missing `DEVELOPMENT_TEAM`.** Every one of the four build configurations in the committed project carries
+`DEVELOPMENT_TEAM = 4RXYGKM63F`; the spec named it nowhere. So `xcodegen generate` in this repo produced a
+project **that cannot sign for a device** — and the device is the only place this app's core surface can
+be tested at all. Fixed by adding it per target (project-level placement was tried first and produces a
+different, though equivalent, layout). Re-diffed to confirm: all four `DEVELOPMENT_TEAM` settings then
+match exactly. **The residual three deltas are cosmetic and do not change the build** —
+`explicitFileType` → `lastKnownFileType` on the two product references, plus an added `TargetAttributes`
+block naming the same team. ⚠️ **The committed `.xcodeproj` was deliberately NOT regenerated**, because
+only a hardware build can validate that, and `#4` already shows this repo carrying one device-unverified
+commit. Decision written into `CLAUDE.md` as an explicit override of the global rule.
+
+**#2 — the repo is harness-covered, with a gate proven red → green → red.** `harness init` scaffolds a
+placeholder that fails on purpose; it was replaced with one `ios_build` gate:
+`xcodebuild -project RingApp.xcodeproj -scheme RingApp -sdk iphonesimulator -configuration Debug
+-derivedDataPath build build CODE_SIGNING_ALLOWED=NO`. Verified in the environment gates actually run in
+— a detached worktree at `HEAD` holding only tracked files:
+
+- **`BUILD SUCCEEDED`**, and the worktree stayed clean afterwards on both tracked and untracked files
+  (`build/` is already gitignored, so derived data cannot enter a run diff and trip diff-scope).
+- **Both targets compile under the one gate** — confirmed not by trusting the declared dependency but by
+  listing the built bundle and finding `PlugIns/NotificationService.appex` inside it.
+- ⭐ **The gate can actually FAIL.** Garbage appended to `BLEManager.swift` in the throwaway worktree
+  produced `BUILD FAILED` with real compile errors. A gate that cannot go red is the specific defect
+  `harness init` was changed to stop scaffolding, so this check is not optional.
+- Timing: `[FAIL] placeholder` → `[OK] ios_build`, **7.9 s from cold** after deleting derived data. The
+  first 7.7 s reading was re-run cold precisely because it looked too fast to be a real build.
+
+**Two traps avoided, both documented in the harness README and both repo-specific:** the gate does **not**
+run `xcodegen`, because regeneration here is **not** a no-op (the three cosmetic deltas above would dirty
+`project.pbxproj` on every run — the README says test this per repo and never infer it); and the command
+uses `-sdk iphonesimulator` rather than `-destination 'generic/platform=iOS Simulator'` **specifically to
+contain no apostrophe**, since a gate is `shlex`-split and one quote breaks it before it runs.
+
+`[prompt]` carries the do-not-self-verify sentence (Codex's sandbox cannot reach CoreSimulator and
+false-escalates on `supportedRuntimes=[]`) plus the standing BLE warning. `[disclosure]` states plainly
+that the gate is compile-only and **BLE-blind**, with per-area notes firing on `RingApp/BLE/**` and
+`NotificationService/**`. ⚠️ **`.swift` is a guarded extension, so Swift changes here now require a
+ticket** — `.yml` is not guarded, which is why the `project.yml` edit above needed no escape hatch.
+
+⛔ **One correction worth keeping: the closed-ledger marker is the literal token `[status: closed]`, not
+a tick and not the word CLOSED.** The global `CLAUDE.md` still describes the older form. Read from
+`ledger_common.py` — the token must fall in the first 200 characters and is ignored inside backtick code
+spans — and both closures were then verified by calling the machinery's own
+`ledger_item_declares_finished()` on the actual bullets rather than by eye.
+
 ## 2026-09-12 — Onboarded to the context system
 
 Onboarded per `~/OffCloud/claude-config/ONBOARD-THIS-REPO.md`. The repo started with no `HISTORY.md`,
