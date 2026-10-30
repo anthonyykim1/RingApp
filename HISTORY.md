@@ -3,12 +3,39 @@
 Newest first. One dated entry per episode. Verbatim closed ledger items go to `LEDGER_ARCHIVE.md`;
 this file carries one compressed line each.
 
+### Closed at the 2026-10-30 checkpoint — 1 items moved out of the ledger
+
+_Full verbatim text is in `LEDGER_ARCHIVE.md`._
+
+- [2026-10-30] **#5** [status: closed] Moved to the shortcuts repo as shortcuts#4 (owner, 2026-10-30: shortcut work lives there). Sender row removed + blocklist flipped by owner. Was:… Full text in `LEDGER_ARCHIVE.md`.
+## 2026-10-29 — iOS 27 disabled the catch-all message automation
+
+iOS 27 merged automations into shortcuts and converted ours into a shortcut named "Message" whose
+trigger shows "Configure 'Sender' to enable this automation". The Sender field now accepts only
+specific contacts — no "anyone" option. CORRECTED same night: a fresh Message trigger asks for
+"Message" OR "Sender" (either one enables it), so the old workaround (no sender + "Message
+contains" a single space) should still work; the converted shortcut was likely disabled only by
+an EMPTY Sender row the conversion added. Unverified until the row is removed. The automation has
+likely been silent since the upgrade, which is also why the running-automation banner seemed to
+disappear — not an Apple change (no source found saying iOS 27 removed the banner). Also found the
+1:1 branch had been inverted into an allowlist (buzz only for listed numbers); owner confirmed the
+list is a BLOCKLIST. Lesson: an OS upgrade can silently disable an automation — "the banner went
+away" is a symptom to check, not good news. Fix path → #5; Notification trigger is the fallback.
+2026-10-30: owner removed the Sender row and flipped the blocklist; per owner, shortcut work now
+lives in `~/OffCloud/shortcuts` — `shortcuts.md` moved there as `recipes/ringapp-message-buzz.md`,
+#5 moved to shortcuts#4. This repo keeps the App Intent code.
+
 ### Closed at the 2026-09-12 checkpoint — 2 items moved out of the ledger
 
 _Full verbatim text is in `LEDGER_ARCHIVE.md`._
 
 - [2026-09-12] **#1** [status: closed] `project.yml` is AUTHORITATIVE; the committed `.xcodeproj` is a generated artifact. Settled by execution 2026-09-12: regenerated the spec into a… Full text in `LEDGER_ARCHIVE.md`.
 - [2026-09-12] **#2** [status: closed] RingApp is now harness-covered. `harness init` run, the deliberately-failing placeholder replaced with a real `ios_build` gate, and red -> green… Full text in `LEDGER_ARCHIVE.md`.
+### Closed at the 2026-10-29 checkpoint — 1 items moved out of the ledger
+
+_Full verbatim text is in `LEDGER_ARCHIVE.md`._
+
+- [2026-10-29] **#3** [status: closed] All three context goals are PROVEN in this repo — `context_health.py` reports **3 proven / 0 not yet seen / 0 failing**, and `state_audit.py`… Full text in `LEDGER_ARCHIVE.md`.
 ## 2026-09-12 — `project.yml` made authoritative, and the repo onboarded to the harness
 
 Two standing questions closed in one pass (`OPEN.md` #1 and #2), both settled by execution rather than

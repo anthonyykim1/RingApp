@@ -24,13 +24,17 @@ no deploy.
 - **Timers:** keepalive/getVibrate (120s, always); alarm check (30s, only when an enabled alarm exists);
   battery read on connect + app foreground (no periodic poll). Disconnected scan is bounded (12s window +
   15→120s backoff), not continuous. See `battery.md`.
+- ⭐ **Split of work (owner, 2026-10-30): this repo owns the CODE — the `Vibrate Ring` App Intent
+  (`VibrateIntent.swift`) and everything it calls. Building, fixing and documenting the iPhone
+  shortcut that runs it happens in `~/OffCloud/shortcuts`** (its recipe and ledger). Change the
+  intent's parameters here, then update the recipe there.
 - **Shortcuts debounce:** uses the Sender property (not Name) as `debounceKey`.
 - **"Running your automation" banner — a closed platform dead end. Do not re-test.** No suppression
   exists on iOS (through iOS 26) for message-trigger automations: Apple privacy block (`Notify When Run`
   hidden, Shortcuts absent from Notifications). **Focus mode does NOT work either** — falsified on-device
   2026-05-28 (iOS 26 / iPhone Air): Shortcuts isn't listable in Focus "Silence Notifications From", and an
   allowlist + Time Sensitive OFF still leaves the visual pop-up. The only escape is moving message
-  detection off-device (Mac — `mac-migration-plan.md`). Detail: `shortcuts.md`.
+  detection off-device (Mac — `mac-migration-plan.md`). Detail: `~/OffCloud/shortcuts/recipes/ringapp-message-buzz.md`.
 - ⭐ **The invariant that dead end bought: a platform dead end stays dead. Stop iterating and route
   around it.** It ate hours, then Focus was *assumed* to be the fix, then Focus itself was falsified.
 
@@ -93,7 +97,7 @@ truth for `.xcodeproj` edits). **Read it before any iOS work here.** Only what i
 ## Project docs to read before specific changes
 
 - BLE protocol / connect handshake / HR-monitor disable → `context.md`
-- Shortcuts / VibrateIntent / the running-automation banner → `shortcuts.md`
+- Shortcuts / VibrateIntent / the running-automation banner → `~/OffCloud/shortcuts/recipes/ringapp-message-buzz.md`
 - Battery, scan backoff, why location is load-bearing → `battery.md`
 - Visual / interaction design → `design.md`
 - Mac-build migration history → `mac-migration-plan.md`
